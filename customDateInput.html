@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <label for="myDateInput">Enter Your Date in dd/mm/yyyy</label>
+    <input type="text" id="myDateInput" class="custom-date-input">
+
+    <script>
+        /*
+        Just add a class of 'custom-date-input' to your text input and this will magically work.
+        When you enter e.g. 13/07/1998 in your input and click outside the input, the value will
+        change to Mon 13th Jul 1998.
+
+        Example usage:
+        <input type="text" class="custom-date-input">
+        */
+        (function() {
+            const dateInputs = document.querySelectorAll('.custom-date-input');
+            for (let input of dateInputs) {
+                input.addEventListener('change', function() {
+                    const inputValue = this.value;
+                    const regexValidator = new RegExp('^[0-9][0-9]\/[0-9][0-9]\/[0-9][0-9][0-9][0-9]$');
+                    const isValidInput = regexValidator.test(inputValue);
+                    if (isValidInput) {
+                        const date = new Date(inputValue.split('/').reverse());
+                        const formattedDate = formatDate(date);
+                        this.value = formattedDate;
+                    } else {
+                        input.value = '';
+                    }
+                });
+            }
+            function formatDate(date) {
+                const dateFormatter = new Intl.DateTimeFormat('en-GB', {weekday: 'short', month: 'short', year: 'numeric', day: 'numeric'});
+                let dateInfo = dateFormatter.formatToParts(date);
+                dateInfo = dateInfo.map(info => info.value);
+                dateInfo = dateInfo.filter(info => info !== ' ' && info !== ', ');
+                const [weekday, day, month, year] = dateInfo;
+                return `${weekday} ${ordinal(day)} ${month} ${year}`;
+            }
+
+            function ordinal(number) {
+                var ordinals = ["th", "st", "nd", "rd"];
+                var modulo = number%100;
+                return number + (ordinals[(modulo-20)%10] || ordinals[modulo] || ordinals[0]);
+            }
+        })();
+    </script>
+</body>
+</html>
